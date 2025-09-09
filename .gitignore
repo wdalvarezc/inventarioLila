@@ -1,0 +1,14 @@
+# Dependencias
+node_modules/
+package-lock.json
+
+# Configuración local
+.env
+
+# Cachés y sesiones
+.wwebjs_auth/
+.wwebjs_cache/
+
+# Archivos del sistema
+.DS_Store
+*.log
