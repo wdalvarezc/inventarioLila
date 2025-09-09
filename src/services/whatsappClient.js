@@ -1,7 +1,9 @@
 import pkg from "whatsapp-web.js";
-import qrcode from "qrcode-terminal";
+import qrcode from "qrcode";
 
 const { Client, LocalAuth } = pkg;
+
+let qrCode; // aquí guardamos el último QR generado
 
 const client = new Client({
   authStrategy: new LocalAuth(),
@@ -11,10 +13,10 @@ const client = new Client({
   },
 });
 
-// Mostrar QR en consola
+// Captura del QR
 client.on("qr", (qr) => {
-  qrcode.generate(qr, { small: true });
-  console.log("📲 Escanea el QR con WhatsApp para iniciar sesión");
+  console.log("📲 Nuevo QR generado");
+  qrCode = qr;
 });
 
 // Confirmar conexión
@@ -29,11 +31,10 @@ client.on("auth_failure", (msg) => {
 
 client.initialize();
 
-// Función para enviar mensajes
+// 👉 Función para enviar mensajes
 export const sendWhatsAppMessage = async (to, message) => {
   try {
-    // Nota: usa formato internacional ej: "573001112233"
-    const chatId = `${to}@c.us`;
+    const chatId = `${to}@c.us`; // formato internacional
     await client.sendMessage(chatId, message);
     console.log("✅ WhatsApp enviado a", to);
   } catch (err) {
@@ -41,4 +42,10 @@ export const sendWhatsAppMessage = async (to, message) => {
   }
 };
 
-export default client;
+// 👉 Función para obtener el QR como imagen base64
+export const getQrImage = async () => {
+  if (!qrCode) return null;
+  return await qrcode.toDataURL(qrCode);
+};
+
+export { client };
