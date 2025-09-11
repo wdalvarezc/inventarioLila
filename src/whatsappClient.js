@@ -1,16 +1,16 @@
-// src/services/whatsappClient.js
 import pkg from "whatsapp-web.js";
 import qrcode from "qrcode";
-import SequelizeStore from "./SequelizeStore.js";
+import SequelizeStore from "./services/SequelizeStore.js";
 
 const { Client, RemoteAuth } = pkg;
 
 const store = new SequelizeStore();
+let lastQR = null;
 
 const client = new Client({
   authStrategy: new RemoteAuth({
+    clientId: "myapp", // nombre único de sesión
     store,
-    clientId: "myapp", // un identificador único
     backupSyncIntervalMs: 300000,
   }),
   puppeteer: {
@@ -19,27 +19,28 @@ const client = new Client({
   },
 });
 
-let qrCodeData = null;
-
 client.on("qr", (qr) => {
-  qrCodeData = qr;
-  qrcode.generate(qr, { small: true });
-  console.log("📲 Escanea el QR para iniciar sesión");
+  console.log("QR recibido");
+  lastQR = qr; // guardamos el QR en memoria
 });
 
 client.on("ready", () => {
-  console.log("✅ WhatsApp conectado y sesión guardada en DB");
+  console.log("✅ Cliente de WhatsApp listo");
 });
 
-client.on("disconnected", async () => {
-  console.log("⚠️ Cliente desconectado, eliminando sesión...");
-  await store.remove("myapp");
+client.on("authenticated", () => {
+  console.log("🔐 Autenticado correctamente");
 });
 
-client.initialize();
+client.on("auth_failure", (msg) => {
+  console.error("❌ Error de autenticación:", msg);
+});
 
-// Endpoint para QR
-export const getQRCode = () => qrCodeData;
+export const getQR = async () => {
+  if (!lastQR) return null;
+  return await qrcode.toDataURL(lastQR); // convertimos QR en imagen base64
+};
+
 
 // Envío de mensajes
 export const sendWhatsAppMessage = async (to, message) => {
@@ -51,3 +52,5 @@ export const sendWhatsAppMessage = async (to, message) => {
     console.error("❌ Error enviando mensaje:", err.message);
   }
 };
+
+export default client;

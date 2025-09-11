@@ -4,7 +4,7 @@ import Order from "../models/Order.js";
 import Customer from "../models/Customer.js";
 import OrderItem from "../models/OrderItem.js";
 import Product from "../models/Product.js";
-import { sendWhatsAppMessage } from "../services/whatsappClient.js";
+import { sendWhatsAppMessage } from "../whatsappClient.js";
 
 export const createOrder = async (req, res) => {
   const { customerId, items, deliveryDate } = req.body;
