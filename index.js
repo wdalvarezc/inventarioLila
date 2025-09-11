@@ -1,5 +1,5 @@
 import app from "./src/app.js";
-import { getQRCode, initWhatsApp } from "./src/services/whatsappClient.js";
+import { getQRCode} from "./src/services/whatsappClient.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -16,7 +16,4 @@ app.get("/qr", async (req, res) => {
 // Servidor
 app.listen(PORT, async () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
-  await initWhatsApp()
-    .then(() => console.log('generando session de whatsapp'))
-    .catch((error) => console.log('ocurrio un error'));
 });
