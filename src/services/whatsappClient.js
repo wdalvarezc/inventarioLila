@@ -7,14 +7,11 @@ const { Client, RemoteAuth } = pkg;
 
 const store = new SequelizeStore();
 
-// 📌 Variable global para guardar el último QR generado
-let qrCodeData = null;
-
 const client = new Client({
   authStrategy: new RemoteAuth({
     store,
-    clientId: "myapp", // Identificador único de la sesión
-    backupSyncIntervalMs: 300000, // cada 5 min guarda en DB
+    clientId: "myapp", // un identificador único
+    backupSyncIntervalMs: 300000,
   }),
   puppeteer: {
     headless: true,
@@ -22,43 +19,35 @@ const client = new Client({
   },
 });
 
-// 📌 Guardamos QR en base64 y lo mostramos en consola también
-client.on("qr", async (qr) => {
-  qrCodeData = await qrcode.toDataURL(qr); // se guarda en memoria
-  console.log("📲 Escanea el QR para iniciar sesión");
+let qrCodeData = null;
 
-  // también lo pintamos en consola como antes
-  qrcode.toString(qr, { type: "terminal" }, (err, url) => {
-    if (!err) console.log(url);
-  });
+client.on("qr", (qr) => {
+  qrCodeData = qr;
+  qrcode.generate(qr, { small: true });
+  console.log("📲 Escanea el QR para iniciar sesión");
 });
 
 client.on("ready", () => {
   console.log("✅ WhatsApp conectado y sesión guardada en DB");
-  qrCodeData = null; // limpiamos QR porque ya no es necesario
 });
 
-// ⚠️ Manejar desconexión
 client.on("disconnected", async () => {
   console.log("⚠️ Cliente desconectado, eliminando sesión...");
-  await store.remove("myapp"); // se pasa el clientId que usamos arriba
+  await store.remove("myapp");
 });
 
 client.initialize();
 
-// 📌 Endpoint para obtener QR
+// Endpoint para QR
 export const getQRCode = () => qrCodeData;
 
-// 📌 Función para enviar mensajes
+// Envío de mensajes
 export const sendWhatsAppMessage = async (to, message) => {
   try {
     if (!client) throw new Error("Cliente no inicializado");
-    const chatId = `${to}@c.us`;
-    await client.sendMessage(chatId, message);
+    await client.sendMessage(`${to}@c.us`, message);
     console.log("✅ Mensaje enviado a", to);
   } catch (err) {
     console.error("❌ Error enviando mensaje:", err.message);
   }
 };
-
-export { client };

@@ -8,7 +8,7 @@ import "./models/Product.js";
 import "./models/Customer.js";
 import "./models/Order.js";
 import "./models/OrderItem.js";
-import "./models/WhatsappStore.js";
+import "./models/WhatsappSession.js";
 
 import productRoutes from "./routes/productRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
@@ -25,7 +25,7 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/orders", orderRoutes);
 
 // Conexión y sync
-sequelize.sync({ alter: true }).then(() => {
+sequelize.sync({ force: true }).then(() => {
   console.log("✅ Tablas creadas/sincronizadas");
 });
 
