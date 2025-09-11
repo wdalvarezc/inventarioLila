@@ -25,7 +25,7 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/orders", orderRoutes);
 
 // Conexión y sync
-sequelize.sync({ Alter: true }).then(() => {
+sequelize.sync({ alter: true }).then(() => {
   console.log("✅ Tablas creadas/sincronizadas");
 });
 
