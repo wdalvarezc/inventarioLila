@@ -1,25 +1,47 @@
-import WhatsappStore from "../models/WhatsappStore.js";
+// src/services/SequelizeStore.js
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../config/database.js";
 
-class SequelizeStore {
-  constructor() {
-    this.sessionId = "default"; // 👈 puedes usar un ID por cliente
+class WhatsappSession extends Model {}
+WhatsappSession.init(
+  {
+    sessionId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      primaryKey: true,
+    },
+    session: {
+      type: DataTypes.JSONB, // o TEXT si prefieres guardar como string
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    modelName: "WhatsappSession",
+  }
+);
+
+export default class SequelizeStore {
+  async sessionExists(sessionId) {
+    const count = await WhatsappSession.count({ where: { sessionId } });
+    return count > 0;
   }
 
-  async save(data) {
-    await WhatsappStore.upsert({
-      id: this.sessionId,
-      data,
-    });
+  async save(sessionId, data) {
+    await WhatsappSession.upsert({ sessionId, session: data });
   }
 
-  async load() {
-    const record = await WhatsappStore.findByPk(this.sessionId);
-    return record ? record.data : null;
+  async getSession(sessionId) {
+    const row = await WhatsappSession.findByPk(sessionId);
+    return row ? row.session : null;
   }
 
-  async remove() {
-    await WhatsappStore.destroy({ where: { id: this.sessionId } });
+  async delete(sessionId) {
+    await WhatsappSession.destroy({ where: { sessionId } });
+  }
+
+  async listSessions() {
+    const rows = await WhatsappSession.findAll({ attributes: ["sessionId"] });
+    return rows.map((r) => r.sessionId);
   }
 }
-
-export default SequelizeStore;
