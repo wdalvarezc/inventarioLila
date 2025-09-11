@@ -5,13 +5,13 @@ const PORT = process.env.PORT || 3000;
 
 // Endpoint para mostrar QR de WhatsApp
 app.get("/qr", async (req, res) => {
-  const qr = getQR();
+  const qr = await getQR();
   if (qr) {
     res.send(`
       <html>
         <body style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;">
           <h2>Escanea este código QR con WhatsApp 📲</h2>
-          <img src="data:image/png;base64,${qr}" alt="Escanea este código QR con WhatsApp"/>
+          <img src="${qr}" alt="Escanea este código QR con WhatsApp"/>
         </body>
       </html>
     `);
