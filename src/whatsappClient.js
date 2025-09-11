@@ -20,8 +20,10 @@ const client = new Client({
 });
 
 client.on("qr", async (qr) => {
-  console.log("QR recibido");
-  lastQR = await qrcode.toDataURL(qr); // guardamos el QR en memoria
+  lastQR = await qrcode.toDataURL(qr)
+    .then(() => console.log("QR recibido"))
+    .catch(()=>console.log('error de qr')) // guardamos el QR en memoria
+
 });
 
 client.on("ready", () => {
