@@ -19,9 +19,9 @@ const client = new Client({
   },
 });
 
-client.on("qr", (qr) => {
+client.on("qr", async (qr) => {
   console.log("QR recibido");
-  lastQR = qr; // guardamos el QR en memoria
+  lastQR = await qrcode.toDataURL(qr); // guardamos el QR en memoria
 });
 
 client.on("ready", () => {
@@ -38,7 +38,7 @@ client.on("auth_failure", (msg) => {
 
 export const getQR = async () => {
   if (!lastQR) return null;
-  return await qrcode.toDataURL(lastQR); // convertimos QR en imagen base64
+  return lastQR // convertimos QR en imagen base64
 };
 
 
