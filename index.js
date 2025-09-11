@@ -1,5 +1,5 @@
 import app from "./src/app.js";
-import { getQR} from "./src/whatsappClient.js";
+import client, { getQR } from "./src/whatsappClient.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -16,4 +16,6 @@ app.get("/qr", async (req, res) => {
 // Servidor
 app.listen(PORT, async () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  // Inicializamos el cliente de WhatsApp
+  client.initialize();
 });
