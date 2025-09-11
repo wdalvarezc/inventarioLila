@@ -7,7 +7,14 @@ const PORT = process.env.PORT || 3000;
 app.get("/qr", async (req, res) => {
   const qr = getQR();
   if (qr) {
-    res.send(`<img src="${qr}" alt="Escanea este código QR con WhatsApp"/>`);
+    res.send(`
+      <html>
+        <body style="display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;">
+          <h2>Escanea este código QR con WhatsApp 📲</h2>
+          <img src="data:image/png;base64,${qr}" alt="Escanea este código QR con WhatsApp"/>
+        </body>
+      </html>
+    `);
   } else {
     res.send("✅ WhatsApp ya está conectado o aún no se ha generado QR.");
   }
