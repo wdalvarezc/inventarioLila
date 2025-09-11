@@ -1,3 +1,4 @@
+// src/services/whatsappClient.js
 import pkg from "whatsapp-web.js";
 import qrcode from "qrcode";
 import WhatsappSession from "../models/WhatsappSession.js";
@@ -5,44 +6,38 @@ import WhatsappSession from "../models/WhatsappSession.js";
 const { Client } = pkg;
 
 let client;
-let qrCodeData = null; // Guardamos el QR en memoria para servirlo por un endpoint
+let qrCodeData = null;
 
-// 🚀 Inicializar WhatsApp con sesión desde la DB
 export const initWhatsApp = async () => {
   try {
-    // Buscar sesión guardada
-    const savedSession = await WhatsappSession.findOne();
+    // Buscar si ya existe sesión guardada
+    const saved = await WhatsappSession.findOne();
+    let sessionData = saved ? saved.session : null;
 
-    let clientOptions = {
+    client = new Client({
+      session: sessionData, // cargamos sesión desde DB
       puppeteer: {
         headless: true,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
       },
-    };
-
-    if (savedSession) {
-      clientOptions.session = savedSession.session;
-      console.log("📦 Sesión encontrada en la DB, conectando sin QR...");
-    }
-
-    client = new Client(clientOptions);
-
-    // Evento de QR → lo convertimos en base64 para mostrar en el frontend
-    client.on("qr", async (qr) => {
-      qrCodeData = await qrcode.toDataURL(qr); 
-      console.log("📲 Escanea el QR con WhatsApp para iniciar sesión");
     });
 
-    // Evento autenticado → guardar en DB
+    // Generar QR
+    client.on("qr", async (qr) => {
+      qrCodeData = await qrcode.toDataURL(qr);
+      console.log("📲 Escanea el QR con WhatsApp");
+    });
+
+    // Guardar sesión en DB al autenticar
     client.on("authenticated", async (session) => {
       console.log("✅ Sesión autenticada, guardando en DB...");
-      qrCodeData = null; // ya no necesitamos QR
-      await WhatsappSession.destroy({ where: {} }); // Limpiar sesiones previas
+      await WhatsappSession.destroy({ where: {} }); // limpiar anterior
       await WhatsappSession.create({ session });
     });
 
-    // Listo para usar
+    // Conectado
     client.on("ready", () => {
+      qrCodeData = null;
       console.log("✅ WhatsApp Web conectado y listo!");
     });
 
@@ -56,17 +51,17 @@ export const initWhatsApp = async () => {
   }
 };
 
-// 📩 Función para enviar mensajes
+// Endpoint para obtener QR
+export const getQRCode = () => qrCodeData;
+
+// Función para enviar mensajes
 export const sendWhatsAppMessage = async (to, message) => {
   try {
-    if (!client) throw new Error("Cliente de WhatsApp no inicializado");
+    if (!client) throw new Error("Cliente no inicializado");
     const chatId = `${to}@c.us`;
     await client.sendMessage(chatId, message);
-    console.log("✅ WhatsApp enviado a", to);
+    console.log("✅ Mensaje enviado a", to);
   } catch (err) {
     console.error("❌ Error enviando mensaje:", err.message);
   }
 };
-
-// 🔹 Endpoint para obtener el QR actual
-export const getQRCode = () => qrCodeData;
