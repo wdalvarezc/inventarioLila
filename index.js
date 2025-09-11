@@ -1,11 +1,11 @@
 import app from "./src/app.js";
-import { getQRCode,initWhatsApp } from "./src/services/whatsappClient.js";
+import { getQRCode, initWhatsApp } from "./src/services/whatsappClient.js";
 
 const PORT = process.env.PORT || 3000;
 
 // Endpoint para mostrar QR de WhatsApp
 app.get("/qr", async (req, res) => {
- const qr = getQRCode();
+  const qr = getQRCode();
   if (qr) {
     res.send(`<img src="${qr}" alt="Escanea este código QR con WhatsApp"/>`);
   } else {
@@ -14,7 +14,9 @@ app.get("/qr", async (req, res) => {
 });
 
 // Servidor
-app.listen(PORT,async () => {
+app.listen(PORT, async () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
-  await initWhatsApp(); 
+  await initWhatsApp()
+    .then(() => console.log('generando session de whatsapp'))
+    .catch((error) => console.log('ocurrio un error'));
 });
