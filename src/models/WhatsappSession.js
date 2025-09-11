@@ -2,18 +2,21 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-const WhatsappSession = sequelize.define("WhatsappSession", {
-  session: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    primaryKey: true,
+const WhatsappSession = sequelize.define(
+  "WhatsappSession",
+  {
+    session: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    data: {
+      type: DataTypes.JSONB, // Usamos JSONB en Postgres
+      allowNull: false,
+    },
   },
-  data: {
-    type: DataTypes.JSONB, // JSONB es lo ideal en Postgres
-    allowNull: false,
-  },
-}, {
-  tableName: "WhatsappSessions", // 👈 el nombre exacto de la tabla
-});
+  {
+    tableName: "WhatsappSessions",
+  }
+);
 
 export default WhatsappSession;

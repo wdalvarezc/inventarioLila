@@ -15,7 +15,12 @@ app.get("/qr", async (req, res) => {
 
 // Servidor
 app.listen(PORT, async () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
-  // Inicializamos el cliente de WhatsApp
-  client.initialize();
+  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  try {
+    // Inicializamos el cliente de WhatsApp
+    await client.initialize();
+    console.log("📲 Cliente de WhatsApp inicializado");
+  } catch (error) {
+    console.error("❌ Error inicializando WhatsApp:", error);
+  }
 });

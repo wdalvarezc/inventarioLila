@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import sequelize from "./config/database.js";
-import cors from 'cors';
+import cors from "cors";
 
 // Importar modelos (importante para sync)
 import "./models/Product.js";
@@ -24,9 +24,14 @@ app.use("/api/products", productRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/orders", orderRoutes);
 
-// Conexión y sync
-sequelize.sync({ force: true }).then(() => {
-  console.log("✅ Tablas creadas/sincronizadas");
-});
+// 🔹 Conexión y sync sin borrar datos
+sequelize
+  .sync({ alter: true }) // ← mantiene tablas y datos
+  .then(() => {
+    console.log("✅ Tablas creadas/sincronizadas (sin perder datos)");
+  })
+  .catch((err) => {
+    console.error("❌ Error al sincronizar con la BD:", err);
+  });
 
 export default app;
