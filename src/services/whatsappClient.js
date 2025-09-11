@@ -10,16 +10,16 @@ let qrCodeData = null;
 
 export const initWhatsApp = async () => {
   try {
-    // Buscar si ya existe sesión guardada
-    const saved = await WhatsappSession.findOne();
-    let sessionData = saved ? saved.session : null;
+    const sessionRow = await WhatsappSession.findOne();
+    const sessionData = sessionRow ? sessionRow.session : null;
 
-    client = new Client({
-      session: sessionData, // cargamos sesión desde DB
+    const client = new Client({
+      authStrategy: new LocalAuth(),
       puppeteer: {
         headless: true,
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
       },
+      session: sessionData || undefined, // 👈 pasar la sesión previa si existe
     });
 
     // Generar QR
@@ -30,9 +30,13 @@ export const initWhatsApp = async () => {
 
     // Guardar sesión en DB al autenticar
     client.on("authenticated", async (session) => {
-      console.log("✅ Sesión autenticada, guardando en DB...");
-      await WhatsappSession.destroy({ where: {} }); // limpiar anterior
-      await WhatsappSession.create({ session });
+      try {
+        console.log("✅ Sesión autenticada, guardando en DB...");
+        await WhatsappSession.destroy({ where: {} }); // limpiar sesiones previas
+        await WhatsappSession.create({ session });    // 👈 aquí sí guardamos los datos
+      } catch (err) {
+        console.error("❌ Error guardando sesión en DB:", err);
+      }
     });
 
     // Conectado
