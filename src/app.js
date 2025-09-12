@@ -26,7 +26,7 @@ app.use("/api/orders", orderRoutes);
 
 // 🔹 Conexión y sync sin borrar datos
 sequelize
-  .sync({ force: true }) // ← mantiene tablas y datos
+  .sync({ alter: true }) // ← mantiene tablas y datos
   .then(() => {
     console.log("✅ Tablas creadas/sincronizadas (sin perder datos)");
   })
