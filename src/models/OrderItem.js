@@ -5,7 +5,8 @@ import Product from "./Product.js";
 
 const OrderItem = sequelize.define("OrderItem", {
   quantity: { type: DataTypes.INTEGER, allowNull: false },
-  price: { type: DataTypes.FLOAT, allowNull: false } // precio de venta en ese momento
+  price: { type: DataTypes.FLOAT, allowNull: false }, // precio de venta en ese momento
+  description: { type: DataTypes.STRING },
 }, {
   timestamps: true
 });

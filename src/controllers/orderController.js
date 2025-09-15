@@ -4,7 +4,6 @@ import Order from "../models/Order.js";
 import Customer from "../models/Customer.js";
 import OrderItem from "../models/OrderItem.js";
 import Product from "../models/Product.js";
-import { sendWhatsAppMessage } from "../whatsappClient.js";
 
 export const createOrder = async (req, res) => {
   const { customerId, items, deliveryDate } = req.body;
@@ -99,37 +98,6 @@ export const updateOrderStatus = async (req, res) => {
 
     order.status = status;
     await order.save();
-    if (order.Customer?.dataValues?.phone && order.status == 'empacar') {
-      await sendWhatsAppMessage(
-        `57${order.Customer.dataValues.phone}`,
-        `✨ ¡Hola ${order.Customer.dataValues.name} ✨
-Tu pedido ya está en proceso 🛍️💖
-Lo estoy preparando con mucho cuidado para que llegue perfecto para ti 🫶
-Te avisaré apenas esté listo para envío 🚀📦`
-      );
-    }
-    if (order.Customer?.dataValues?.phone && order.status == 'enviar') {
-      await sendWhatsAppMessage(
-        `57${order.Customer.dataValues.phone}`,
-        `🚀 ¡Hola ${order.Customer.dataValues.name}!
-Tu pedido ya está en camino rumbo a tu casa 🏡📦
-Por favor mantente atent@ a tu celular para coordinar la entrega 📲✨
-
-¡Gracias por tu compra y por confiar en LILA! 💛😊`
-      );
-    }
-
-        if (order.Customer?.dataValues?.phone && order.status == 'entregar') {
-      await sendWhatsAppMessage(
-        `57${order.Customer.dataValues.phone}`,
-        `🚀 ¡Hola ${order.Customer.dataValues.name} ✨️🚀 !
-Espero que tu pedido haya llegado en perfectas condiciones 📦✨
-Queremos recordarte que nuestros productos no cuentan con garantía, por eso es muy importante asegurarte de que queden bien instalados 🛠️😊
-
-¡Gracias por tu compra y por confiar en LILA! 💛 Tu apoyo hace posible que sigamos creando con amor para ti 🙌💫`
-      );
-    }
-
     res.json({ message: "Estado actualizado", order });
   } catch (err) {
     res.status(500).json({ error: err.message });

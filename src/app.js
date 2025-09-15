@@ -8,7 +8,6 @@ import "./models/Product.js";
 import "./models/Customer.js";
 import "./models/Order.js";
 import "./models/OrderItem.js";
-import "./models/WhatsappSession.js";
 
 import productRoutes from "./routes/productRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
