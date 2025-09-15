@@ -6,7 +6,7 @@ import OrderItem from "../models/OrderItem.js";
 import Product from "../models/Product.js";
 
 export const createOrder = async (req, res) => {
-  const { customerId, items, deliveryDate } = req.body;
+  const { customerId, items, deliveryDate, description } = req.body;
 
   try {
     const order = await Order.create({ customerId, deliveryDate });
@@ -23,6 +23,7 @@ export const createOrder = async (req, res) => {
         productId: product.id,
         quantity: item.quantity,
         price: product.price * item.quantity
+        description: product.description
       });
 
       // Restar stock
