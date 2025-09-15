@@ -22,8 +22,8 @@ export const createOrder = async (req, res) => {
         orderId: order.id,
         productId: product.id,
         quantity: item.quantity,
-        price: product.price * item.quantity
-        description: product.description
+        price: product.price * item.quantity,
+        description: description
       });
 
       // Restar stock
